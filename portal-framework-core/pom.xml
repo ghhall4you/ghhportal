@@ -1,0 +1,300 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.ghh.portal</groupId>
+	<artifactId>portal-framework-core</artifactId>
+	<version>1.0.4</version><!-- 0.0.1-SNAPSHOT --><!-- 1.0.2 -->
+	<build>
+		<finalName>portal-framework-core</finalName>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.3</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.4</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.wvengen</groupId>
+				<artifactId>proguard-maven-plugin</artifactId>
+				<version>2.0.13</version>
+				<executions>
+					<execution>
+						<!-- 混淆时刻，这里是打包的时候混淆 -->
+						<phase>package</phase>
+						<goals>
+							<!-- 使用插件的什么功能，当然是混淆 -->
+							<goal>proguard</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<!-- 是否将生成的PG文件安装部署,false则不在本地生成pg的jar包 -->
+					<attach>true</attach>
+					<!-- 是否混淆 -->
+					<obfuscate>true</obfuscate>
+					<!-- 指定生成文件分类 -->
+					<attachArtifactClassifier>proguard</attachArtifactClassifier>
+					<options>
+						<!-- JDK目标版本1.7 -->
+						<option>-target 1.7</option>
+						<!-- 不做收缩（不删除注释和未被引用的代码） ,默认开启收缩 -->
+						<option>-dontshrink</option>
+						<!-- 不做优化（不变更代码实现逻辑） , 默认开启优化 -->
+						<option>-dontoptimize</option>
+						<!-- 不忽略类库下非公用类文件及成员 ，即non-public的类和成员 -->
+						<option>-dontskipnonpubliclibraryclasses</option>
+						<option>-dontskipnonpubliclibraryclassmembers</option>
+						<!-- 优化时允许访问并修改有修饰符的类和类的成员 -->
+						<option>-allowaccessmodification</option>
+						<!-- 确定统一的混淆名称，方法同名混淆后亦同名，方法不同名混淆后亦不同名 -->
+						<option>-useuniqueclassmembernames</option>
+						<!-- 不混淆所有包名，混淆后WEB项目问题实在太多，毕竟Spring配置中有大量固定写法的包名 -->
+						<option>-keeppackagenames</option>
+
+						<!-- 解决spring无法自动装载类的错误，非常重要，搞了2个小时 -->
+						<option>-keepdirectories</option>
+
+						<!-- 不混淆所有特殊的类 -->
+						<option>-keepattributes
+							Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,LocalVariable*Table,*Annotation*,Synthetic,EnclosingMethod</option>
+						<!-- 不混淆所有的set/get方法，毕竟项目中使用的部分第三方框架（例如Shiro）会用到大量的set/get映射 -->
+						<option>-keepclassmembers public class * {void set*(***);**
+							get*();}</option>
+
+						<!-- 不混淆加NotProguard注解的类 、方法和属性 -->
+						<option>-keep @com.ghh.framework.core.annotation.NotProguard class
+							* {*;}</option>
+						<!-- 不混淆加NotProguard注解的属性 -->
+						<option>-keepclassmembers class * {
+							@com.ghh.framework.core.annotation.NotProguard &lt;fields&gt;;}</option>
+						<!-- 不混淆加NotProguard注解的方法 -->
+						<option>-keepclassmembers class * {
+							@com.ghh.framework.core.annotation.NotProguard &lt;methods&gt;;}</option>
+
+						<!-- 不混淆dto包下的所有类名，且类中的方法也不混淆 -->
+						<option>-keep class com.ghh.framework.common.dto.** {*;}</option>
+						<option>-keep class com.ghh.framework.common.CodeManager
+							{&lt;methods&gt;; }</option>
+						<!-- 不混淆entites包下的所有类名，且类中的方法、属性都不混淆 -->
+						<option>-keep class com.ghh.framework.common.entities.** {*;}</option>
+						<!-- 不混淆异常类，属性和方法混淆 -->
+						<option>-keep class com.ghh.framework.GhhException </option>
+						<!-- 不混淆所有注解，属性和方法都不混淆 -->
+						<option>-keep class com.ghh.framework.core.annotation.** {*;}</option>
+						<!-- 不混淆aop对象，方法不混淆，属性混淆 -->
+						<option>-keep class com.ghh.framework.core.aop.**
+							{&lt;methods&gt;; }</option>
+						<!-- 不混淆dao对象，方法不混淆，属性混淆 -->
+						<option>-keep class com.ghh.framework.core.dao.**
+							{&lt;methods&gt;; }</option>
+						<!-- 不混淆intercepter对象，方法和属性混淆 -->
+						<option>-keep class com.ghh.framework.core.interceptor.**
+							{&lt;methods&gt;; }</option>
+						<!-- 不混淆support对象，方法和属性混淆 -->
+						<option>-keep class com.ghh.framework.core.support.** {*;}</option>
+						<option>-keep class com.ghh.framework.core.persistence.**
+							{&lt;methods&gt;; }</option>
+						<!-- 不混淆异常类，属性和方法混淆 -->
+						<option>-keep class com.ghh.framework.exception.** </option>
+
+						<!-- 不混淆web包的类名，属性和方法混淆 -->
+						<option>-keep class com.ghh.framework.web.** {*;}</option>
+
+						<option>-keep class
+							com.ghh.framework.web.system.quartz.IPortalQuartzJob
+							{&lt;methods&gt;; }</option>
+						<option>-keep class
+							com.ghh.framework.web.security.auth.service.ICustomLoginService
+							{&lt;methods&gt;; }</option>
+						<option>-keep class
+							com.ghh.framework.web.security.restauth.client.factory.GhhHttpComponentsClientHttpRequestFactory
+							{&lt;methods&gt;; }</option>
+							<!-- 添加 by lfw2156 -->
+						<option>-keep class
+							com.ghh.framework.web.system.client.ClientManager
+							{&lt;methods&gt;; }</option>
+						<option>-keep class
+							com.ghh.framework.web.system.cache.remote.rmi.IClientRMIService
+							{&lt;methods&gt;; }</option>
+						<option>-keep class
+							com.ghh.framework.web.security.auth.service.ISSOLoginService
+							{&lt;methods&gt;; }</option>
+						<!-- 不混淆util包的类名，属性和方法也不混淆 -->	
+						<option>-keep class com.ghh.framework.util.** {*;}</option>
+					</options>
+					<!-- 添加依赖，这里你可以按你的需要修改，这里测试只需要一个JRE的Runtime包就行了 -->
+					<libs>
+						<lib>${java.home}/lib/rt.jar</lib>
+					</libs>
+					<!-- 加载文件的过滤器，就是你的工程目录了 -->
+					<inFilter>com/ghh/**</inFilter>
+					<!--指定混淆的jar包，我这里是将上一步输出的jar包进行混淆 -->
+					<injar>${project.build.finalName}.jar</injar>
+
+					<!--指定输出的jar包名 -->
+					<outjar>${project.build.finalName}</outjar>
+					<!-- 输出目录 -->
+					<outputDirectory>${project.build.directory}</outputDirectory>
+				</configuration>
+			</plugin>
+			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-source-plugin</artifactId> 
+				<version>2.4</version> <executions> <execution> <id>attach-sources</id> <phase>verify</phase>要绑定到的生命周期的阶段 
+				在verify之后，install之前执行下面指定的goal <goals> <goal>jar-no-fork</goal>类似执行mvn source:jar 
+				</goals> </execution> </executions> </plugin> -->
+		</plugins>
+	</build>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<name>Snapshots</name>
+			<url>http://192.168.101.100:8081/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+		<repository>
+			<id>releases</id>
+			<name>Releases</name>
+			<url>http://192.168.101.100:8081/nexus/content/repositories/releases/</url>
+		</repository>
+	</distributionManagement>
+	<properties>
+		<springframework.version>4.2.5.RELEASE</springframework.version>
+	</properties>
+	<dependencies>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.0.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${springframework.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-aspects -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aspects</artifactId>
+			<version>${springframework.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-jms -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jms</artifactId>
+			<version>${springframework.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.4</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.9.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.9.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.9.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/net.sf.ehcache/ehcache-core -->
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache-core</artifactId>
+			<version>2.4.8</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/net.sf.ehcache/ehcache-web -->
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache-web</artifactId>
+			<version>2.0.4</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/net.sf.ehcache/ehcache-terracotta -->
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache-terracotta</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/net.sf.ehcache/ehcache-jgroupsreplication -->
+		<dependency>
+			<groupId>net.sf.ehcache</groupId>
+			<artifactId>ehcache-jgroupsreplication</artifactId>
+			<version>1.7</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-ehcache -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-ehcache</artifactId>
+			<version>4.3.11.Final</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/log4j/log4j -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.quartz-scheduler/quartz -->
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>2.0.2</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.3.6</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-web -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-web</artifactId>
+			<version>4.0.4.RELEASE</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.9</version>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.xml.bind</groupId>
+					<artifactId>jaxb-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>stax</groupId>
+					<artifactId>stax-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+
+</project>
